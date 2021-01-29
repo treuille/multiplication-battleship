@@ -4,7 +4,6 @@ Little app using Streamlit state for my son to play multiplication battleship
 
 ## Todo
 
-- Hello world
 - Create a board
 - Let the user guess with an array of buttons
 - Show balloons when they guess properly
