@@ -6,7 +6,8 @@ Ships = Set[Tuple[int, int]]
 
 def get_settings():
     """Gets some settings for the board."""
-    board_size = st.sidebar.number_input("Board size", 5, 20, 10)
+    board_size = st.sidebar.number_input("Board size", 5, 20, 10,
+            on_change=board_size_chaged)
     num_ships = st.sidebar.number_input("Number of ships", 1, 10, 5)
     return board_size, num_ships
 
@@ -18,16 +19,13 @@ def add_ship(ship_len: int, ships: Ships, board_size) -> Ships:
     # Stop trying to add the ship if it takes more than
     # MAX_ITER attempts to find a valid location
     for _ in range(MAX_ITER):
-        start_pos_1 = random.randrange(0, board_size - ship_len)
-        start_pos_2 = random.randrange(0, board_size)
+        pos_1 = random.randrange(0, board_size - ship_len)
+        pos_2 = random.randrange(0, board_size)
         horizontal = bool(random.randint(0, 1))
-        new_ship : Ships = set()
-        for i in range(ship_len):
-            if horizontal:
-                i, j = start_pos_1 + i, start_pos_2
-            else:
-                j, i = start_pos_1 + i, start_pos_2
-            new_ship.add((i, j))
+        if horizontal:
+            new_ship = {(pos_1 + i, pos_2) for i in range(ship_len)}
+        else:
+            new_ship = {(pos_2, pos_1 + i) for i in range(ship_len)}
         if ships.isdisjoint(new_ship):
             return ships.union(new_ship)
     raise RuntimeError(f"Unable to place ship after {MAX_ITER} iterations.")
@@ -39,6 +37,9 @@ def write_board(ships: Ships, board_size: int) -> None:
             for x in range(board_size))
         for y in range(board_size)))
 
+def board_size_chaged(*args):
+    """Callback when the board size has changed."""
+    st.write("The board size has changed:", args)
 
 def main():
     """Execution starts here."""
