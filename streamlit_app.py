@@ -9,7 +9,6 @@ state = st.beta_session_state(board_size=None, num_ships=None, ships=None)
 
 def board_size_changed(new_board_size):
     """Callback when the board size has changed."""
-    st.write("The board size has changed:", new_board_size)
     if state.board_size != new_board_size:
         state.board_size = new_board_size
         if state.num_ships != None:
@@ -17,7 +16,6 @@ def board_size_changed(new_board_size):
  
 def num_ships_changed(new_num_ships):
     """Callback when the board size has changed."""
-    st.write("The number of ships has changed:", new_num_ships)
     if state.num_ships != new_num_ships:
         state.num_ships = new_num_ships
         if state.board_size != None:
@@ -57,11 +55,23 @@ def add_ship(ship_len: int, ships: Ships, board_size) -> Ships:
 
 def write_board(ships: Ships, board_size: int) -> None:
     """Writes out the board to the Streamlit console."""
-    st.text("\n".join(
+    st.sidebar.text("\n".join(
         " ".join("X" if (x, y) in ships else "."
             for x in range(board_size))
         for y in range(board_size)))
 
+def click_cell(x: int, y:int) -> None:
+    """Returns a callback for when the specified cell is clicked."""
+    def cell_clicked():
+        st.sidebar.info(f"Cell `{x}`x`{y}` clicked.")
+    return cell_clicked
+
+def draw_board(state: SessionState) -> None:
+    """Writes out the board to the Streamlit console."""
+    for y in range(1, state.board_size + 1):
+        row = st.beta_columns(state.board_size)
+        for x, cell in zip(range(1, state.board_size + 1), row):
+            cell.button(f"{x}x{y}", on_click=click_cell(x, y))
 
 def main():
     """Execution starts here."""
@@ -69,9 +79,8 @@ def main():
     board_size, num_ships = get_settings()
     board_size_changed(board_size)
     num_ships_changed(num_ships)
-    st.write(type(state), state)
-    st.write("board size", board_size)
     write_board(state.ships, state.board_size)
+    draw_board(state)
 
 if __name__ == "__main__":
     main()
