@@ -5,30 +5,29 @@ from streamlit.session_state import SessionState
 
 Ships = Set[Tuple[int, int]]
 
-state = st.beta_session_state(board_size=None, num_ships=None, ships=None)
+state = st.beta_session_state(initialized=False)
 
-def board_size_changed(new_board_size):
-    """Callback when the board size has changed."""
-    if state.board_size != new_board_size:
-        state.board_size = new_board_size
-        if state.num_ships != None:
-            create_new_random_board(state)
- 
-def num_ships_changed(new_num_ships):
-    """Callback when the board size has changed."""
-    if state.num_ships != new_num_ships:
-        state.num_ships = new_num_ships
-        if state.board_size != None:
-            create_new_random_board(state)
+def config_parameter_changed(*_):
+    """Callback when board_size or num_ships has changed."""
+    # Reset the state to 
+    state.initialized = False
 
-def get_settings():
+def initialize_state(board_size: int, num_ships: int) -> None:
+    """Setup a clean state of the board."""
+    state.board_size = board_size
+    state.num_ships = num_ships
+    create_new_random_board()
+    state.initialized = True
+
+def get_settings() -> Tuple[int, int]:
     """Gets some settings for the board."""
     board_size = st.sidebar.number_input("Board size", 5, 20, 10,
-            on_change=board_size_changed)
-    num_ships = st.sidebar.number_input("Number of ships", 1, 10, 5)
+            on_change=config_parameter_changed)
+    num_ships = st.sidebar.number_input("Number of ships", 1, 10, 5,
+            on_change=config_parameter_changed)
     return board_size, num_ships
 
-def create_new_random_board(state: SessionState) -> None:
+def create_new_random_board() -> None:
     """Adds a new random board to the state."""
     ships = set()
     for ship_len in range(1, state.num_ships + 1):
@@ -77,8 +76,8 @@ def main():
     """Execution starts here."""
     st.write("# Battleship")
     board_size, num_ships = get_settings()
-    board_size_changed(board_size)
-    num_ships_changed(num_ships)
+    if not state.initialized:
+        initialize_state(board_size, num_ships)
     write_board(state.ships, state.board_size)
     draw_board(state)
 
