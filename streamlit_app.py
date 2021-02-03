@@ -74,11 +74,11 @@ def click_cell(x: int, y:int) -> None:
     return cell_clicked
 
 def draw_board(state: SessionState) -> None:
-    """Writes out the board to the Streamlit console."""
-    for y in range(1, state.board_size + 1):
-        row = st.beta_columns(state.board_size)
-        for x, cell in zip(range(1, state.board_size + 1), row):
-
+     """Writes out the board to the Streamlit console."""
+     for y in range(1, state.board_size + 1):
+         row = st.beta_columns(state.board_size)
+         for x, cell in zip(range(1, state.board_size + 1), row):
+             cell.button(f"{x}x{y}", on_click=click_cell(x, y))
 
 def main():
     """Execution starts here."""
