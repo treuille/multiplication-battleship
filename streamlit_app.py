@@ -5,8 +5,11 @@ from streamlit.session_state import SessionState
 
 Ships = Set[Tuple[int, int]]
 
-state = st.beta_session_state(initialized=False)
+# What I'm trying to do here is have the state reset if either the board
+# size of number of ships changed. In order to do so, I've added this
+# initialized flag to the state which feels awkward.
 
+# It feels awkward to me that I 
 def config_parameter_changed(*_):
     """Callback when board_size or num_ships has changed."""
     # Reset the state to 
@@ -19,12 +22,17 @@ def initialize_state(board_size: int, num_ships: int) -> None:
     create_new_random_board()
     state.initialized = True
 
+state = st.beta_session_state(initialized=False)
+board_size = st.sidebar.number_input("Board size", 5, 20, 10,
+        on_change=config_parameter_changed)
+num_ships = st.sidebar.number_input("Number of ships", 1, 10, 5,
+        on_change=config_parameter_changed)
+if not state.initialized:
+    initialize_state(board_size, num_ships)
+
+
 def get_settings() -> Tuple[int, int]:
     """Gets some settings for the board."""
-    board_size = st.sidebar.number_input("Board size", 5, 20, 10,
-            on_change=config_parameter_changed)
-    num_ships = st.sidebar.number_input("Number of ships", 1, 10, 5,
-            on_change=config_parameter_changed)
     return board_size, num_ships
 
 def create_new_random_board() -> None:
@@ -70,14 +78,11 @@ def draw_board(state: SessionState) -> None:
     for y in range(1, state.board_size + 1):
         row = st.beta_columns(state.board_size)
         for x, cell in zip(range(1, state.board_size + 1), row):
-            cell.button(f"{x}x{y}", on_click=click_cell(x, y))
+
 
 def main():
     """Execution starts here."""
     st.write("# Battleship")
-    board_size, num_ships = get_settings()
-    if not state.initialized:
-        initialize_state(board_size, num_ships)
     write_board(state.ships, state.board_size)
     draw_board(state)
 
