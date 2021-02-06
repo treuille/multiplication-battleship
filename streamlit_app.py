@@ -16,6 +16,13 @@ def config_parameter_changed(*_):
     # Reset the state to 
     state.initialized = False
 
+def product_guessed(product_guess):
+    """Callback when the user makes a guess as to the product."""
+    if product_guess == str(state.current_guess[0] * state.current_guess[1]):
+        st.balloons()
+        state.guesses.add(state.current_guess)
+        state.current_guess = None
+
 def initialize_state(board_size: int, num_ships: int) -> None:
     """Setup a clean state of the board."""
     state.board_size: int = board_size
@@ -70,7 +77,7 @@ def click_cell(point: Point) -> None:
         state.current_guess = point
     return cell_clicked
 
-def draw_board(state: SessionState) -> None:
+def draw_board() -> None:
  """Writes out the board to the Streamlit console."""
  for y in range(1, state.board_size + 1):
      row = st.beta_columns(state.board_size)
@@ -88,16 +95,8 @@ def ask_for_answer() -> None:
     if state.current_guess == None:
         return
     product_str = f"{state.current_guess[0]}X{state.current_guess[1]}"
-    st.info(f"What is {product_str}?")
-    guess = st.text_input(product_str)
-    if not guess:
-        return
-    if guess == str(state.current_guess[0] * state.current_guess[1]):
-        if state.current_guess in state.ships:
-            st.balloons()
-        st.success(f"{guess} is correct!")
-        state.guesses.add(state.current_guess)
-        state.current_guess = None
+    st.sidebar.error(f"What is {product_str}?")
+    st.sidebar.text_input(product_str, on_change=product_guessed)
 
 def main():
     """Execution starts here."""
@@ -107,11 +106,15 @@ def main():
             on_change=config_parameter_changed)
     num_ships = st.sidebar.number_input("Number of ships", 1, 10, 5,
             on_change=config_parameter_changed)
+    if hasattr(state, "ships") and hasattr(state, "guesses"):
+        st.sidebar.write(f"{len(state.ships - state.guesses)} remaining")
+
+    st.sidebar.button("Reset", on_click=config_parameter_changed)
     if not state.initialized:
         initialize_state(board_size, num_ships)
 
-    write_board(state.ships, state.board_size)
-    draw_board(state)
+    # write_board(state.ships, state.board_size)
+    draw_board()
     ask_for_answer()
 
 if __name__ == "__main__":
