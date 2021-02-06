@@ -16,10 +16,16 @@ def config_parameter_changed(*_):
     # Reset the state to 
     state.initialized = False
 
+def guess_is_correct(product_guess):
+    """Returns true if the guessed product is correct."""
+    return (product_guess ==
+            str(state.current_guess[0] * state.current_guess[1]))
+
 def product_guessed(product_guess):
     """Callback when the user makes a guess as to the product."""
-    if product_guess == str(state.current_guess[0] * state.current_guess[1]):
-        st.balloons()
+    if guess_is_correct(product_guess):
+        if state.current_guess in state.ships:
+            st.balloons()
         state.guesses.add(state.current_guess)
         state.current_guess = None
 
@@ -78,31 +84,46 @@ def click_cell(point: Point) -> None:
     return cell_clicked
 
 def draw_board() -> None:
- """Writes out the board to the Streamlit console."""
- for y in range(1, state.board_size + 1):
+    """Writes out the board to the Streamlit console."""
+    # First see if the whole board has been guesesed 
+    guessed_everything = state.ships <= state.guesses
+    if guessed_everything:
+        # Reveal every point on the board
+        revealed = {(i, j) for i in range(1, state.board_size + 1)
+                for j in range(1, state.board_size + 1)}
+    else:
+        revealed = state.guesses
+
+    for y in range(1, state.board_size + 1):
      row = st.beta_columns(state.board_size)
      for x, cell in zip(range(1, state.board_size + 1), row):
          point = (x, y)
-         if point not in state.guesses:
+         if point not in revealed:
              cell.button(f"{x}x{y}", on_click=click_cell(point))
          elif point in state.ships:
              cell.write("🔥")
          else:
              cell.write("🌊")
+    
+    if guessed_everything:
+        st.success("Great job!")
 
 def ask_for_answer() -> None:
     """Prompt the user for the answer to the multiplication problem."""
     if state.current_guess == None:
         return
     product_str = f"{state.current_guess[0]}X{state.current_guess[1]}"
-    st.sidebar.error(f"What is {product_str}?")
-    st.sidebar.text_input(product_str, on_change=product_guessed)
+    st.sidebar.warning(f"❓ What is {product_str}?")
+    product_guess = st.sidebar.text_input(product_str,
+        on_change=product_guessed)
+    if product_guess and not guess_is_correct(product_guess):
+       st.sidebar.error(f"🥺 {product_guess} is not correct")
 
 def main():
     """Execution starts here."""
     st.write("# Battleship")
 
-    board_size = st.sidebar.number_input("Board size", 5, 20, 10,
+    board_size = st.sidebar.number_input("Board size", 5, 20, 9,
             on_change=config_parameter_changed)
     num_ships = st.sidebar.number_input("Number of ships", 1, 10, 5,
             on_change=config_parameter_changed)
