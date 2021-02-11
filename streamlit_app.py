@@ -3,6 +3,8 @@ import random
 from typing import Set, Tuple
 from streamlit.session_state import SessionState
 
+# This package simulates an alternative event model
+import st_event
 
 #########
 # Types #
@@ -155,6 +157,25 @@ def ask_for_answer() -> None:
 def main():
     """Execution starts here."""
 
+    BUTTON_1 = "b1"
+    BUTTON_2 = "b2"
+
+    if st_event.changed(BUTTON_1):
+        st.warning(BUTTON_1)
+
+    if st_event.changed(BUTTON_2):
+        st.warning(BUTTON_2)
+    
+    st_event.button(BUTTON_1, key=BUTTON_1)
+    st_event.button(BUTTON_2, key=BUTTON_2)
+
+    if st_event.changed(BUTTON_1):
+        st.warning(BUTTON_1)
+
+    if st_event.changed(BUTTON_2):
+        st.warning(BUTTON_2)
+
+    return
     # Title
     st.write("# Alta Vista Multiplication Battleship")
 
