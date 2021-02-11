@@ -159,21 +159,25 @@ def main():
 
     BUTTON_1 = "b1"
     BUTTON_2 = "b2"
+    NUMBER_INPUT = "number_input"
 
     if st_event.changed(BUTTON_1):
-        st.warning(BUTTON_1)
-
+        st.warning(f"{BUTTON_1} : {st_event.value()}")
     if st_event.changed(BUTTON_2):
-        st.warning(BUTTON_2)
+        st.warning(f"{BUTTON_2} : {st_event.value()}")
+    if st_event.changed(NUMBER_INPUT):
+        st.info(f"{NUMBER_INPUT} : {st_event.value()}")
     
     st_event.button(BUTTON_1, key=BUTTON_1)
     st_event.button(BUTTON_2, key=BUTTON_2)
+    st_event.number_input(NUMBER_INPUT, key=NUMBER_INPUT)
 
     if st_event.changed(BUTTON_1):
         st.warning(BUTTON_1)
-
     if st_event.changed(BUTTON_2):
         st.warning(BUTTON_2)
+    if st_event.changed(NUMBER_INPUT):
+        st.info(f"{NUMBER_INPUT} : {st_event.value()}")
 
     return
     # Title

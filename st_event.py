@@ -39,7 +39,7 @@ def _wrap_widget(widget_func, callback_label):
             # Set the global event value
             if len(args) == 0:
                 _event_value = None
-            elif len(args) == 2:
+            elif len(args) == 1:
                 _event_value = args[0]
             else:
                 err_str = f"Not expecting a callback with {len(args)} args."
