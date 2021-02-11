@@ -11,7 +11,7 @@ Points = Set[Point]
 # initialized flag to the state which feels awkward.
 
 # It feels awkward to me that I 
-def config_parameter_changed(*_):
+def reinitialize_state(*_):
     """Callback when board_size or num_ships has changed."""
     # Reset the state to 
     state.initialized = False
@@ -83,6 +83,11 @@ def click_cell(point: Point) -> None:
         state.current_guess = point
     return cell_clicked
 
+def write_remaining_points() -> None:
+    """Write down the number of ships remining."""
+    # if hasattr(state, "ships") and hasattr(state, "guesses"):
+    st.sidebar.write(f"{len(state.ships - state.guesses)} remaining")
+
 def draw_board() -> None:
     """Writes out the board to the Streamlit console."""
     # First see if the whole board has been guesesed 
@@ -121,20 +126,30 @@ def ask_for_answer() -> None:
 
 def main():
     """Execution starts here."""
+
+    # Title
     st.write("# Battleship")
 
+    # Control parameters
     board_size = st.sidebar.number_input("Board size", 5, 20, 9,
-            on_change=config_parameter_changed)
+            on_change=reinitialize_state)
     num_ships = st.sidebar.number_input("Number of ships", 1, 10, 5,
-            on_change=config_parameter_changed)
-    if hasattr(state, "ships") and hasattr(state, "guesses"):
-        st.sidebar.write(f"{len(state.ships - state.guesses)} remaining")
+            on_change=reinitialize_state)
 
-    st.sidebar.button("Reset", on_click=config_parameter_changed)
+    # Intializing the state here. I find doing this here very awkward.
     if not state.initialized:
         initialize_state(board_size, num_ships)
 
+    # Write the number of points remaining
+    write_remaining_points()
+
+    # Reset button. The logic is all screwy here!
+    st.sidebar.button("Reset", on_click=reinitialize_state)
+
+    # This is just for debug purposes.
     # write_board(state.ships, state.board_size)
+
+    # Now draw the main UI
     draw_board()
     ask_for_answer()
 
