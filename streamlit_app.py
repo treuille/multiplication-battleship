@@ -161,15 +161,13 @@ def main():
     BUTTON_2 = "b2"
     NUMBER_INPUT = "number_input"
 
-    if st_event.changed(BUTTON_1):
-        st.warning(f"{BUTTON_1} : {st_event.value()}")
-    if st_event.changed(BUTTON_2):
-        st.warning(f"{BUTTON_2} : {st_event.value()}")
+    if st_event.changed("button"):
+        st.warning(f"button : {st_event.value()} : {st_event.context()}")
     if st_event.changed(NUMBER_INPUT):
-        st.info(f"{NUMBER_INPUT} : {st_event.value()}")
+        st.info(f"{NUMBER_INPUT} : {st_event.value()} : {st_event.context()}")
     
-    st_event.button(BUTTON_1)
-    st_event.button(BUTTON_2)
+    st_event.button(BUTTON_1, signal="button", context=11)
+    st_event.button(BUTTON_2, signal="button", context=22)
     st_event.number_input(NUMBER_INPUT)
 
     if st_event.changed(BUTTON_1):
