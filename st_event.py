@@ -2,7 +2,7 @@
 a global-event style."""
 
 import streamlit as st
-from typing import Optional, Any
+from typing import Optional, Any, Union
 import functools
 
 
@@ -10,9 +10,14 @@ import functools
 # Global event object #
 #######################
 
+# This is a sentinal meaning that no signal has been recieved
+class NoSignal:
+    pass
+_no_signal = NoSignal
+
 
 # This is the label of the last event that just fired
-_event_signal: Optional[str] = None
+_event_signal: Optional[Union[str, NoSignal]] = _no_signal
 
 
 # This is the value of the last event that just fired
@@ -75,7 +80,11 @@ button = _wrap_widget(st.button, "on_click")
 # API to get the event #
 ########################
 
-def changed(signal: str) -> bool:
+def no_signal() -> bool:
+    """Returns true if no signal has been fired."""
+    return _event_signal == _no_signal
+
+def signal(signal: str) -> bool:
     """Returns true if the widget with the given signal changed."""
     return _event_signal == signal
 
