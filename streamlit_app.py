@@ -3,31 +3,23 @@ import random
 from typing import Set, Tuple
 from streamlit.session_state import SessionState
 
+
+#########
+# Types #
+#########
+
+
 Point = Tuple[int, int]
 Points = Set[Point]
 
-# What I'm trying to do here is have the state reset if either the board
-# size of number of ships changed. In order to do so, I've added this
-# initialized flag to the state which feels awkward.
 
-# It feels awkward to me that I 
-def reinitialize_state(*_):
-    """Callback when board_size or num_ships has changed."""
-    # Reset the state to 
-    state.initialized = False
+#########
+# State #
+#########
 
-def guess_is_correct(product_guess):
-    """Returns true if the guessed product is correct."""
-    return (product_guess ==
-            str(state.current_guess[0] * state.current_guess[1]))
 
-def product_guessed(product_guess):
-    """Callback when the user makes a guess as to the product."""
-    if guess_is_correct(product_guess):
-        if state.current_guess in state.ships:
-            st.balloons()
-        state.guesses.add(state.current_guess)
-        state.current_guess = None
+state = st.beta_session_state(initialized=False)
+
 
 def initialize_state(board_size: int, num_ships: int) -> None:
     """Setup a clean state of the board."""
@@ -38,18 +30,50 @@ def initialize_state(board_size: int, num_ships: int) -> None:
     create_new_random_board()
     state.initialized = True
 
+
+def guess_is_correct(product_guess):
+    """Returns true if the guessed product is correct."""
+    return (product_guess ==
+            str(state.current_guess[0] * state.current_guess[1]))
+
+
+#############
+# Callbacks #
+#############
+
+
+def reinitialize_state(*_):
+    """Callback to reset the state."""
+    state.initialized = False
+
+
+def click_cell(point: Point) -> None:
+    """Returns a callback for when the specified cell is clicked."""
+    def cell_clicked():
+        state.current_guess = point
+    return cell_clicked
+
+
+def product_guessed(product_guess):
+    """Callback when the user makes a guess as to the product."""
+    if guess_is_correct(product_guess):
+        if state.current_guess in state.ships:
+            st.balloons()
+        state.guesses.add(state.current_guess)
+        state.current_guess = None
+
+
+#########
+# Board #
+#########
+
+
 def create_new_random_board() -> None:
     """Adds a new random board to the state."""
     ships = set()
     for ship_len in range(1, state.num_ships + 1):
         ships = add_ship(ship_len, ships, state.board_size)
     state.ships = ships
-
-state = st.beta_session_state(initialized=False)
-
-def get_settings() -> Tuple[int, int]:
-    """Gets some settings for the board."""
-    return board_size, num_ships
 
 
 def add_ship(ship_len: int, ships: Points, board_size) -> Points:
@@ -70,23 +94,25 @@ def add_ship(ship_len: int, ships: Points, board_size) -> Points:
             return ships.union(new_ship)
     raise RuntimeError(f"Unable to place ship after {MAX_ITER} iterations.")
 
-def write_board(ships: Points, board_size: int) -> None:
-    """Writes out the board to the Streamlit console."""
-    st.sidebar.text("\n".join(
-        " ".join("X" if (x, y) in ships else "."
-            for x in range(1, board_size + 1))
-        for y in range(1, board_size + 1)))
 
-def click_cell(point: Point) -> None:
-    """Returns a callback for when the specified cell is clicked."""
-    def cell_clicked():
-        state.current_guess = point
-    return cell_clicked
+##############
+# Main Logic #
+##############
+
 
 def write_remaining_points() -> None:
     """Write down the number of ships remining."""
     # if hasattr(state, "ships") and hasattr(state, "guesses"):
     st.sidebar.write(f"{len(state.ships - state.guesses)} remaining")
+
+
+def write_board() -> None:
+    """Writes out the board to the Streamlit console."""
+    st.sidebar.text("\n".join(
+        " ".join("X" if (x, y) in state.ships else "."
+            for x in range(1, state.board_size + 1))
+        for y in range(1, state.board_size + 1)))
+        
 
 def draw_board() -> None:
     """Writes out the board to the Streamlit console."""
@@ -113,6 +139,7 @@ def draw_board() -> None:
     if guessed_everything:
         st.success("Great job!")
 
+
 def ask_for_answer() -> None:
     """Prompt the user for the answer to the multiplication problem."""
     if state.current_guess == None:
@@ -124,11 +151,12 @@ def ask_for_answer() -> None:
     if product_guess and not guess_is_correct(product_guess):
        st.sidebar.error(f"🥺 {product_guess} is not correct")
 
+
 def main():
     """Execution starts here."""
 
     # Title
-    st.write("# Battleship")
+    st.write("# Alta Vista Multiplication Battleship")
 
     # Control parameters
     board_size = st.sidebar.number_input("Board size", 5, 20, 9,
@@ -147,11 +175,12 @@ def main():
     st.sidebar.button("Reset", on_click=reinitialize_state)
 
     # This is just for debug purposes.
-    # write_board(state.ships, state.board_size)
+    # write_board()
 
     # Now draw the main UI
     draw_board()
     ask_for_answer()
+
 
 if __name__ == "__main__":
     main()
