@@ -168,9 +168,9 @@ def main():
     if st_event.changed(NUMBER_INPUT):
         st.info(f"{NUMBER_INPUT} : {st_event.value()}")
     
-    st_event.button(BUTTON_1, key=BUTTON_1)
-    st_event.button(BUTTON_2, key=BUTTON_2)
-    st_event.number_input(NUMBER_INPUT, key=NUMBER_INPUT)
+    st_event.button(BUTTON_1)
+    st_event.button(BUTTON_2)
+    st_event.number_input(NUMBER_INPUT)
 
     if st_event.changed(BUTTON_1):
         st.warning(BUTTON_1)
@@ -184,10 +184,12 @@ def main():
     st.write("# Alta Vista Multiplication Battleship")
 
     # Control parameters
-    board_size = st.sidebar.number_input("Board size", 5, 20, 9,
-            on_change=reinitialize_state)
-    num_ships = st.sidebar.number_input("Number of ships", 1, 10, 5,
-            on_change=reinitialize_state)
+    BOARD_SIZE_INPUT = "Board size"
+    with st.sidebar:
+        board_size = st_event.number_input(BOARD_SIZE_INPUT, 5, 20, 9,
+                key=BOARD_SIZE_INPUT)
+        num_ships = st.sidebar.number_input("Number of ships", 1, 10, 5,
+                on_change=reinitialize_state)
 
     # Intializing the state here. I find doing this here very awkward.
     if not state.initialized:

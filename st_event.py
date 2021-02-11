@@ -23,18 +23,19 @@ def _wrap_widget(widget_func, callback_label):
     """Wraps a widget so that it uses the global event object above."""
 
     @functools.wraps(widget_func)
-    def wrapped_widget(*args, key=None, **kwargs):
+    def wrapped_widget(label, *args, key=None, **kwargs):
         """This is a version of the wrapped Streamlit object which uses the
         global even object above."""
-
-        # Becuase we use the key to figure out which widget fired, it cannot be
-        # none.
-        if key == None:
-            raise RuntimeError("Must specify the key.")
 
         def generic_callback(*args):
             """Generic callback for any widget."""
             global _event_key, _event_value
+
+            # Set the global event key
+            if key is None:
+                _event_key = label
+            else:
+                _event_key = key
 
             # Set the global event value
             if len(args) == 0:
@@ -45,14 +46,11 @@ def _wrap_widget(widget_func, callback_label):
                 err_str = f"Not expecting a callback with {len(args)} args."
                 raise RuntimeError(err_str)
 
-            # Set the global event key
-            _event_key = key
-
         # Actually create the widget now
         widget_kwargs = dict(kwargs)
         widget_kwargs["key"] = key
         widget_kwargs[callback_label] = generic_callback
-        return widget_func(*args, **widget_kwargs)
+        return widget_func(label, *args, **widget_kwargs)
 
     return wrapped_widget
 
