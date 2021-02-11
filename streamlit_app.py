@@ -52,7 +52,6 @@ CELL_CLICKED = "cell clicked"
 GUESSED_ANSWER = "guesssed answer"
 
 def handle_signals():
-    st.warning(f"signal: '{st_event._event_signal}'")
     if st_event.signal(CELL_CLICKED):
         state.current_guess = st_event.context()
     elif st_event.signal(GUESSED_ANSWER) and guess_is_correct(st_event.value()):
