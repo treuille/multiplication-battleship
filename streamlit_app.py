@@ -100,16 +100,16 @@ def add_ship(ship_len: int, ships: Points, board_size) -> Points:
 
 def write_remaining_points() -> None:
     """Write down the number of ships remining."""
-    # if hasattr(state, "ships") and hasattr(state, "guesses"):
-    st.write(f"{len(state.ships - state.guesses)} remaining")
+    if hasattr(state, "ships") and hasattr(state, "guesses"):
+        st.write(f"{len(state.ships - state.guesses)} 🔥s remaining")
 
 
 def write_board() -> None:
     """Writes out the board to the Streamlit console."""
-    st.sidebar.text("\n".join(
+    st.beta_expander("Answer key").text("\n".join(
         " ".join("X" if (x, y) in state.ships else "."
-            for x in range(1, state.board_size + 1))
-        for y in range(1, state.board_size + 1)))
+                for x in range(1, state.board_size + 1))
+                for y in range(1, state.board_size + 1)))
         
 
 def draw_board() -> None:
