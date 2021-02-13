@@ -136,15 +136,14 @@ def draw_board() -> None:
 
 def ask_for_answer() -> None:
     """Prompt the user for the answer to the multiplication problem."""
-    if state.current_guess == None:
+    if state.current_guesss == None:
         return
 
     product_str = f"{state.current_guess[0]}X{state.current_guess[1]}"
-    with st.sidebar:
-        st.warning(f"❓ What is {product_str}?")
-        product_guess = st_event.text_input(product_str, signal=GUESSED_ANSWER)
-        if product_guess and not guess_is_correct(product_guess):
-           st.error(f"🥺 {product_guess} is not correct")
+    st.warning(f"❓ What is {product_str}?")
+    product_guess = st_event.text_input(product_str, signal=GUESSED_ANSWER)
+    if product_guess and not guess_is_correct(product_guess):
+       st.error(f"🥺 {product_guess} is not correct")
 
 
 def main():
@@ -160,7 +159,8 @@ def main():
                 signal=RESET_STATE)
 
     # Reinitialize the state
-    if st_event.no_signal() or st_event.signal(RESET_STATE):
+    if (st_event.no_signal() or st_event.signal(RESET_STATE) or
+            not hasattr(state, 'ships') or not hasattr(state, "board_size")): 
         initialize_state(board_size, num_ships)
 
     # Draw the rest of the sidebar GUI
