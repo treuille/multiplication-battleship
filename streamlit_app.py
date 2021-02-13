@@ -181,8 +181,8 @@ def main():
         # Now draw the main UI
         draw_board()
         ask_for_answer()
-    except AttributeError:
-        st.warning("👈 **Please press reset in the sidebar.** (state attribute error)")
+    except TypeError, AttributeError:
+        st.warning("👈 **Please press reset in the sidebar.**")
         raise
 
 if __name__ == "__main__":
