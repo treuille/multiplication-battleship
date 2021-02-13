@@ -136,7 +136,7 @@ def draw_board() -> None:
 
 def ask_for_answer() -> None:
     """Prompt the user for the answer to the multiplication problem."""
-    if state.current_guesss == None:
+    if state.current_guess == None:
         return
 
     product_str = f"{state.current_guess[0]}X{state.current_guess[1]}"
@@ -148,39 +148,42 @@ def ask_for_answer() -> None:
 
 def main():
     """Execution starts here."""
-    # Title
-    st.write("# Alta Vista Multiplication Battleship")
+    try:
+        # Title
+        st.write("# Alta Vista Multiplication Battleship")
 
-    # Control parameters
-    with st.sidebar:
-        board_size = st_event.number_input("Board size", 5, 20, 9,
-                signal=RESET_STATE)
-        num_ships = st_event.number_input("Number of ships", 1, 10, 5,
-                signal=RESET_STATE)
+        # Control parameters
+        with st.sidebar:
+            board_size = st_event.number_input("Board size", 5, 20, 9,
+                    signal=RESET_STATE)
+            num_ships = st_event.number_input("Number of ships", 1, 10, 5,
+                    signal=RESET_STATE)
 
-    # Reinitialize the state
-    if (st_event.no_signal() or st_event.signal(RESET_STATE) or
-            not hasattr(state, 'ships') or not hasattr(state, "board_size")): 
-        initialize_state(board_size, num_ships)
+        # Reinitialize the state
+        if (st_event.no_signal() or st_event.signal(RESET_STATE) or
+                not hasattr(state, 'ships') or not hasattr(state, "board_size")): 
+            initialize_state(board_size, num_ships)
 
-    # Draw the rest of the sidebar GUI
-    with st.sidebar: 
-        # Write the number of points remaining
-        write_remaining_points()
+        # Draw the rest of the sidebar GUI
+        with st.sidebar: 
+            # Write the number of points remaining
+            write_remaining_points()
 
-        # Reset button. The logic is all screwy here!
-        st_event.button("Reset", signal=RESET_STATE)
+            # Reset button. The logic is all screwy here!
+            st_event.button("Reset", signal=RESET_STATE)
 
-        # This is just for debug purposes.
-        write_board()
+            # This is just for debug purposes.
+            write_board()
 
-    # Handle all signals except for RESET_STATE
-    handle_signals()
+        # Handle all signals except for RESET_STATE
+        handle_signals()
 
-    # Now draw the main UI
-    draw_board()
-    ask_for_answer()
-
+        # Now draw the main UI
+        draw_board()
+        ask_for_answer()
+    except AttributeError:
+        st.warning("👈 **Please press reset in the sidebar.** (state attribute error)")
+        raise
 
 if __name__ == "__main__":
     main()
