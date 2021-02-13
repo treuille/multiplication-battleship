@@ -181,7 +181,7 @@ def main():
         # Now draw the main UI
         draw_board()
         ask_for_answer()
-    except TypeError, AttributeError:
+    except (TypeError, AttributeError):
         st.warning("👈 **Please press reset in the sidebar.**")
         raise
 
