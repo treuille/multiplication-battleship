@@ -32,9 +32,9 @@ def initialize_state(board_size: int, num_ships: int) -> None:
     create_new_random_board()
 
 
-def guess_is_correct(product_guess):
+def guess_is_correct(product_guess: str) -> bool:
     """Returns true if the guessed product is correct."""
-    return (product_guess ==
+    return (product_guess.strip() ==
             str(state.current_guess[0] * state.current_guess[1]))
 
 
